@@ -11,8 +11,17 @@ import { useUpdateCart } from "@/app/hook/useUpdateCart";
 import { useLoading } from "@/app/hook/useLoading";
 export default function Checkout() {
 
-    const jwt = sessionStorage.getItem("jwt");
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    let jwt: string | null = null;
+    let user: any = {};
+
+    if (typeof window !== 'undefined') {
+        jwt = sessionStorage.getItem("jwt");
+        user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    } else {
+        console.log('You are on the server');
+        // 👉️ can't use sessionStorage
+    }
+    
     const [totalCartItems, setTotalCartItems] = useState(0);
     const [cartItemList, setCartItemList] = useState<any[]>([]);
     const { updateCart, setUpdateCart } = useUpdateCart();

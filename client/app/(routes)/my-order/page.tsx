@@ -2,8 +2,6 @@
 import globalapi from "@/app/utils_/globalapi";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
-
 import {
     Collapsible,
     CollapsibleContent,
@@ -15,8 +13,17 @@ import { EyeIcon } from "lucide-react";
 import { useLoading } from "@/app/hook/useLoading";
 
 export default function(){
-    const jwt = sessionStorage.getItem('jwt') as string;
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+
+    let jwt: string | null = null;
+    let user: any = {};
+
+    if (typeof window !== 'undefined') {
+        jwt = sessionStorage.getItem("jwt");
+        user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    } else {
+        console.log('You are on the server');
+        // 👉️ can't use sessionStorage
+    }
 
     const [loaded, setLoaded] = useState(false);
     const { setLoading } = useLoading();
@@ -28,12 +35,16 @@ export default function(){
 
     const [orderList, setOrderList] = useState([]);
 
-    const getMyOrder = async() =>{
-        const orderList = await globalapi.getOrderByID(user.id, jwt);
-        setOrderList(orderList);
-        setLoaded(true);
+    const getMyOrder = async () => {
+        if (jwt !== null) {
+            const orderList = await globalapi.getOrderByID(user.id, jwt);
+            setOrderList(orderList);
+            setLoaded(true);
+        } else {
+            console.error('JWT is null');
+            // Handle the error or show a message to the user
+        }
     }
-
     const pathname = usePathname();
 
     useEffect(()=>{

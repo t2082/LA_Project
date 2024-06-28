@@ -7,8 +7,16 @@ import { LoaderCircle, PenLineIcon } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import globalapi from "@/app/utils_/globalapi";
 export default function (){
-    const jwt = sessionStorage.getItem("jwt");
-    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    let jwt: string | null = null;
+    let user: any = {};
+
+    if (typeof window !== 'undefined') {
+        jwt = sessionStorage.getItem("jwt");
+        user = JSON.parse(sessionStorage.getItem('user') || '{}');
+    } else {
+        console.log('You are on the server');
+        // 👉️ can't use sessionStorage
+    }
 
     const [username, setUsername] = useState(user.username);
     const [email, setEmail] = useState(user.email);
